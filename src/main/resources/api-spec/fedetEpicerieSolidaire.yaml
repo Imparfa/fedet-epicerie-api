@@ -1,0 +1,391 @@
+openapi: 3.0.1
+info:
+  title: FEDET Student Solidarity Grocery API
+  version: 1.0.0
+  description: API for managing student food distributions
+servers:
+  - url: https://api.fedet-epicerie.fr
+    description: Production server
+tags:
+  - name: authentication
+  - name: student
+  - name: collect
+  - name: management
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - authentication
+      summary: Register a new student
+      operationId: registerStudent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Successful registration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Bad request
+
+  /auth/login:
+    post:
+      tags:
+        - authentication
+      summary: Login for both students and admins
+      operationId: loginStudentAndAdmin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Incorrect credentials
+
+
+  /student/profile:
+    get:
+      tags:
+        - student
+      summary: Get student profile information
+      operationId: getProfile
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: email
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Profile data for student
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Student not found
+    patch:
+      tags:
+        - student
+      summary: Edit student profile
+      operationId: editProfile
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: email
+          in: query
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentEditRequest'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - Requires ADMIN role for specific fields and STUDENT role for others
+        '404':
+          description: Student not found
+
+  /management/students:
+    get:
+      tags:
+        - management
+      summary: Retrieve the list of students (ADMIN only)
+      operationId: getStudents
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Successful retrieved list of students
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Student'
+        '403':
+          description: Forbidden - Requires ADMIN role
+
+  /management/stats:
+    get:
+      tags:
+        - management
+      summary: Retrieve general statistics
+      operationId: getStats
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsResponse'
+
+  /collect/scan:
+    get:
+      tags:
+        - collect
+      summary: Scan a student via their QR Code
+      operationId: collectScan
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: qrCode
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Student found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '404':
+          description: Student not found
+
+  /collect/validate:
+    post:
+      tags:
+        - collect
+      summary: Validate a student's visit to the collection point
+      operationId: collectValidate
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidateCollectRequest'
+      responses:
+        '200':
+          description: Visit successfully validated
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Authorization: Bearer <token> (with role: admin or student)"
+
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        role:
+          $ref: '#/components/schemas/Role'
+
+    StatsResponse:
+      type: object
+      properties:
+        totalStudents:
+          type: integer
+        totalVisits:
+          type: integer
+        visitsToday:
+          type: integer
+
+    RegisterRequest:
+      type: object
+      properties:
+        firstname:
+          type: string
+        lastname:
+          type: string
+        birthdate:
+          type: string
+          format: date
+        email:
+          type: string
+        password:
+          type: string
+        formation:
+          $ref: '#/components/schemas/Formation'
+        graduation:
+          $ref: '#/components/schemas/Graduation'
+        isStudent:
+          type: boolean
+        isWorker:
+          type: boolean
+        household:
+          type: integer
+
+    Student:
+      type: object
+      properties:
+        firstname:
+          type: string
+        lastname:
+          type: string
+        birthdate:
+          type: string
+          format: date
+        email:
+          type: string
+        formation:
+          $ref: '#/components/schemas/Formation'
+        graduation:
+          $ref: '#/components/schemas/Graduation'
+        isStudent:
+          type: boolean
+        isWorker:
+          type: boolean
+        household:
+          type: integer
+        lastVisit:
+          type: string
+          format: date
+        lastLocation:
+          type: string
+        qrCode:
+          type: string
+
+    StudentEditRequest:
+      type: object
+      properties:
+        firstname:
+          type: string
+        lastname:
+          type: string
+        birthdate:
+          type: string
+          format: date
+        email:
+          type: string
+        formation:
+          $ref: '#/components/schemas/Formation'
+        graduation:
+          $ref: '#/components/schemas/Graduation'
+        isStudent:
+          type: boolean
+        isWorker:
+          type: boolean
+        household:
+          type: integer
+      required: [ ]
+
+    ValidateCollectRequest:
+      type: object
+      properties:
+        studentId:
+          type: string
+        location:
+          type: string
+        paymentMethod:
+          $ref: '#/components/schemas/PaymentMethod'
+
+    PaymentMethod:
+      type: string
+      enum:
+        - CASH
+        - CARD
+
+    Formation:
+      type: string
+      enum:
+        - ASPIC
+        - ISEN
+        - SEATECH
+        - ESADTPM
+        - BTS PI
+        - DUMONT
+        - TOURRACHE
+        - IEQT
+        - BONAPARTE
+        - CNAM
+        - IFPVPS
+        - KEDGE
+        - S2T
+        - GENIE BIOLOGIQUE
+        - TECHNIQUE DE COMMUNICATION
+        - STAPS
+        - GEA
+        - GEII
+        - GMP
+        - GIM
+        - IAE
+        - DROIT
+        - ECO GESTION
+        - INGEMEDIA
+        - MMI
+        - CAMONDO
+        - CROIX ROUGE
+        - PPA
+        - CAMPUS EDUCTIVE
+        - CONSERVATOIRE
+        - CFA
+        - ESGI
+        - YNOV
+        - AUTRE
+
+    Graduation:
+      type: string
+      enum:
+        - "BAC+2"
+        - "BAC+3"
+        - "BAC+5"
+        - "BAC+8"
+      x-enum-varnames:
+        - BAC_2
+        - BAC_3
+        - BAC_5
+        - BAC_8
+    Role:
+      type: string
+      enum:
+        - STUDENT
+        - ADMIN

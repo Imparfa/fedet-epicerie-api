@@ -1,0 +1,13 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - '5494:5432'
+    volumes:
+      - ./postgres-data:/var/lib/postgresql
+    environment:
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "root"
+      POSTGRES_DB: "fedetEpicerieSolidaire"
