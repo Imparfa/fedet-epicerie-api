@@ -23,6 +23,7 @@ jobs:
       contents: read
       security-events: write
       issues: write
+      packages: write
 
     services:
       db:
