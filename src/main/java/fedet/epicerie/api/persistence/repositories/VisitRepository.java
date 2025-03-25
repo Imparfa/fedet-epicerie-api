@@ -4,6 +4,7 @@ import fedet.epicerie.api.domain.models.Visit;
 import fedet.epicerie.api.domain.ports.VisitPort;
 import fedet.epicerie.api.persistence.mappers.VisitMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -39,6 +40,34 @@ public class VisitRepository implements VisitPort {
     @Override
     public List<Visit> findByDate(LocalDate date) {
         return visitRepositoryJPA.findByVisitDate(date).stream()
+                .map(visitMapper::toModel)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Visit> findByEmailAndDateBetween(String email, LocalDate start, LocalDate end) {
+        return visitRepositoryJPA.findByStudentEmailAndVisitDateBetween(email, start, end).stream()
+                .map(visitMapper::toModel)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Visit> findByDateBetween(LocalDate start, LocalDate end) {
+        return visitRepositoryJPA.findByVisitDateBetween(start, end).stream()
+                .map(visitMapper::toModel)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Visit> findByEmail(String email) {
+        return visitRepositoryJPA.findByStudentEmail(email).stream()
+                .map(visitMapper::toModel)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Visit> findLast(Integer limit) {
+        return visitRepositoryJPA.findRecentVisits(PageRequest.of(0, limit)).stream()
                 .map(visitMapper::toModel)
                 .collect(Collectors.toList());
     }

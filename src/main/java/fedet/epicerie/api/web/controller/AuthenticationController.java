@@ -14,6 +14,7 @@ import fedet.epicerie.api.web.services.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(value = "*")
 public class AuthenticationController implements AuthenticationApi {
     private final AdminPort adminPort;
     private final StudentPort studentPort;

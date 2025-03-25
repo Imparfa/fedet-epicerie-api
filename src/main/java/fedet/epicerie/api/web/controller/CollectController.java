@@ -5,14 +5,14 @@ import fedet.epicerie.api.domain.models.Visit;
 import fedet.epicerie.api.domain.ports.StudentPort;
 import fedet.epicerie.api.domain.ports.VisitPort;
 import fedet.epicerie.api.web.apis.CollectApi;
-import fedet.epicerie.api.web.dtos.FormationDto;
-import fedet.epicerie.api.web.dtos.GraduationDto;
 import fedet.epicerie.api.web.dtos.StudentDto;
 import fedet.epicerie.api.web.dtos.ValidateCollectRequestDto;
+import fedet.epicerie.api.web.mappers.StudentDtoMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,10 +21,12 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(value = "*")
 @PreAuthorize("hasRole('ADMIN')")
 public class CollectController implements CollectApi {
     private final StudentPort studentPort;
     private final VisitPort visitPort;
+    private final StudentDtoMapper studentDtoMapper;
 
     @Override
     public ResponseEntity<StudentDto> collectScan(@RequestParam String qrCode) {
@@ -33,18 +35,7 @@ public class CollectController implements CollectApi {
             return ResponseEntity.notFound().build();
         }
 
-        StudentDto studentDto = new StudentDto()
-                .firstname(student.getFirstname())
-                .lastname(student.getLastname())
-                .email(student.getEmail())
-                .birthdate(student.getBirthdate())
-                .formation(FormationDto.fromValue(student.getFormation()))
-                .graduation(GraduationDto.fromValue(student.getGraduation()))
-                .isStudent(student.getIsStudent())
-                .isWorker(student.getIsWorker())
-                .household(student.getHousehold());
-
-        return ResponseEntity.ok(studentDto);
+        return ResponseEntity.ok(studentDtoMapper.toDto(student));
     }
 
     @Override

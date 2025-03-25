@@ -15,7 +15,7 @@ spring:
   cloud:
     vault:
       uri: http://localhost:8200
-      token: hvs.CAESIP7P9MYdh9iUs5uNnQ_fRnx2NBezvzoPiQ93q0NxUp2xGh4KHGh2cy45bkJZbEYwTUNBZ0FuTVVPQW55ODdKbnE
+      token: hvs.CAESILpMx-NePkdJKTUvUuSzDAtPEDpvSZHjTd4Z-YazCXwKGh4KHGh2cy5NR2J6V1Q1Z0g1YnZ3Q29WNEdiTjdMbG4
       kv:
         enabled: true
         backend: secret

@@ -16,5 +16,13 @@ public interface VisitPort {
 
     List<Visit> findByDate(LocalDate date);
 
+    List<Visit> findByEmailAndDateBetween(String email, LocalDate start, LocalDate end);
+
+    List<Visit> findByDateBetween(LocalDate start, LocalDate end);
+
+    List<Visit> findByEmail(String email);
+
+    List<Visit> findLast(Integer limit);
+
     Visit save(Visit visit);
 }

@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: API for managing student food distributions
 servers:
-  - url: https://api.fedet-epicerie.fr
+  - url: https://fedet.truttmann.fr
     description: Production server
 tags:
   - name: authentication
@@ -139,6 +139,44 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Student'
+        '403':
+          description: Forbidden - Requires ADMIN role
+
+  /management/visits:
+    get:
+      tags:
+        - management
+      summary: Retrieve the list of visits (ADMIN only)
+      operationId: getVisits
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: email
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Successful retrieved list of visits
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Visit'
         '403':
           description: Forbidden - Requires ADMIN role
 
@@ -323,6 +361,19 @@ components:
       properties:
         studentId:
           type: string
+        location:
+          type: string
+        paymentMethod:
+          $ref: '#/components/schemas/PaymentMethod'
+
+    Visit:
+      type: object
+      properties:
+        student:
+          $ref: '#/components/schemas/Student'
+        visitDate:
+          type: string
+          format: date
         location:
           type: string
         paymentMethod:
