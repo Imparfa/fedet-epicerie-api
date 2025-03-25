@@ -12,6 +12,20 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+  cloud:
+    vault:
+      uri: http://localhost:8200
+      token: hvs.CAESIP7P9MYdh9iUs5uNnQ_fRnx2NBezvzoPiQ93q0NxUp2xGh4KHGh2cy45bkJZbEYwTUNBZ0FuTVVPQW55ODdKbnE
+      kv:
+        enabled: true
+        backend: secret
+        application-name: jwt-passphrase
+#  web:
+#    cors:
+#      allowed-origin-patterns: http://localhost:8100
+#      allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+#      allowed-headers: *
+#      allow-credentials: true
 #logging:
 #  level:
 #    org.springframework.security: DEBUG

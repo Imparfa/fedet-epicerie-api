@@ -1,18 +1,39 @@
 package fedet.epicerie.api.web.services;
 
 import fedet.epicerie.api.common.utils.WithRandom;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 class JwtServiceTest implements WithRandom {
 
+    @Mock
+    private VaultService vaultService;
+
     @InjectMocks
-    private JwtService jwtService = new JwtService();
+    private JwtService jwtService;
+
+    private AutoCloseable closeable;
+
+    @BeforeEach
+    void setUp() {
+        closeable = openMocks(this);
+        when(vaultService.getSecretKey()).thenReturn("superSecretKeyForJwtGenerationWithAtLeast256Bits");
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        closeable.close();
+    }
 
     @ParameterizedTest
     @CsvSource({
