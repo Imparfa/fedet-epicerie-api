@@ -34,7 +34,7 @@ public class CollectController implements CollectApi {
         if (student == null) {
             return ResponseEntity.notFound().build();
         }
-
+        student.setQrCode(null);
         return ResponseEntity.ok(studentDtoMapper.toDto(student));
     }
 

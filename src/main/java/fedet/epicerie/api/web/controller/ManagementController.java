@@ -1,5 +1,6 @@
 package fedet.epicerie.api.web.controller;
 
+import fedet.epicerie.api.domain.models.Student;
 import fedet.epicerie.api.domain.models.Visit;
 import fedet.epicerie.api.domain.ports.StudentPort;
 import fedet.epicerie.api.domain.ports.VisitPort;
@@ -33,7 +34,10 @@ public class ManagementController implements ManagementApi {
     @Override
     public ResponseEntity<List<StudentDto>> getStudents() {
         List<StudentDto> studentDtos = studentPort.findAll().stream()
-                .map(studentDtoMapper::toDto)
+                .map(student -> {
+                    student.setQrCode(null);
+                    return studentDtoMapper.toDto(student);
+                })
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(studentDtos);
@@ -54,7 +58,12 @@ public class ManagementController implements ManagementApi {
         }
 
         List<VisitDto> studentDtos = visits.stream()
-                .map(visitDtoMapper::toDto)
+                .map(visit -> {
+                    Student erasedQr = visit.getStudent();
+                    erasedQr.setQrCode(null);
+                    visit.setStudent(erasedQr);
+                    return visitDtoMapper.toDto(visit);
+                })
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(studentDtos);
