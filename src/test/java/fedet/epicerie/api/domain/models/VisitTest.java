@@ -15,7 +15,8 @@ class VisitTest implements WithRandom {
         int id = randomInt();
         Student student = random(Student.class);
         LocalDate visitDate = LocalDate.now().minusDays(5);
-        String location = randomString();
+        Distribution distribution = Distribution.builder().id(randomUUID())
+                .name(randomString()).address(randomString()).build();
         String paymentMethod = randomString();
 
         // When
@@ -23,7 +24,7 @@ class VisitTest implements WithRandom {
                 .id(id)
                 .student(student)
                 .visitDate(visitDate)
-                .location(location)
+                .distribution(distribution)
                 .paymentMethod(paymentMethod)
                 .build();
 
@@ -32,7 +33,7 @@ class VisitTest implements WithRandom {
         assertThat(visit.getId()).isEqualTo(id);
         assertThat(visit.getStudent()).isEqualTo(student);
         assertThat(visit.getVisitDate()).isEqualTo(visitDate);
-        assertThat(visit.getLocation()).isEqualTo(location);
+        assertThat(visit.getDistribution()).isEqualTo(distribution);
         assertThat(visit.getPaymentMethod()).isEqualTo(paymentMethod);
     }
 
@@ -43,21 +44,22 @@ class VisitTest implements WithRandom {
         int id = randomInt();
         Student student = random(Student.class);
         LocalDate visitDate = LocalDate.now().minusDays(5);
-        String location = randomString();
+        Distribution distribution = Distribution.builder().id(randomUUID())
+                .name(randomString()).address(randomString()).build();
         String paymentMethod = randomString();
 
         // When
         visit.setId(id);
         visit.setStudent(student);
         visit.setVisitDate(visitDate);
-        visit.setLocation(location);
+        visit.setDistribution(distribution);
         visit.setPaymentMethod(paymentMethod);
 
         // Then
         assertThat(visit.getId()).isEqualTo(id);
         assertThat(visit.getStudent()).isEqualTo(student);
         assertThat(visit.getVisitDate()).isEqualTo(visitDate);
-        assertThat(visit.getLocation()).isEqualTo(location);
+        assertThat(visit.getDistribution()).isEqualTo(distribution);
         assertThat(visit.getPaymentMethod()).isEqualTo(paymentMethod);
     }
 }

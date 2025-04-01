@@ -23,8 +23,9 @@ public class VisitEty {
     @Column(name = "VISIT_DATE")
     private LocalDate visitDate;
 
-    @Column(name = "LOCATION")
-    private String location;
+    @ManyToOne
+    @JoinColumn(name = "DISTRIBUTION_ID", nullable = false)
+    private DistributionEty distribution;
 
     @Column(name = "PAYMENT_METHOD")
     private String paymentMethod;

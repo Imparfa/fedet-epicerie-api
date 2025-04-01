@@ -9,8 +9,8 @@ servers:
 tags:
   - name: authentication
   - name: student
-  - name: collect
   - name: management
+  - name: collect
 
 paths:
   /auth/register:
@@ -122,6 +122,106 @@ paths:
         '404':
           description: Student not found
 
+  /management/stats:
+    get:
+      tags:
+        - management
+      summary: Retrieve general statistics
+      operationId: getStats
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsResponse'
+
+  /management/distributions:
+    get:
+      tags:
+        - management
+      summary: Get all distribution points
+      operationId: getDistributions
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: List of distribution points
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Distribution'
+
+    post:
+      tags:
+        - management
+      summary: Create a new distribution point
+      operationId: createDistribution
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DistributionCreateEditRequest'
+      responses:
+        '201':
+          description: Distribution point created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Distribution'
+
+  /management/distributions/{id}:
+    patch:
+      tags:
+        - management
+      summary: Update an existing distribution point
+      operationId: updateDistribution
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DistributionCreateEditRequest'
+      responses:
+        '200':
+          description: Distribution point updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Distribution'
+
+    delete:
+      tags:
+        - management
+      summary: Delete a distribution point
+      operationId: deleteDistribution
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Distribution point deleted successfully
+
   /management/students:
     get:
       tags:
@@ -130,6 +230,22 @@ paths:
       operationId: getStudents
       security:
         - bearerAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: Successful retrieved list of students
@@ -179,22 +295,6 @@ paths:
                   $ref: '#/components/schemas/Visit'
         '403':
           description: Forbidden - Requires ADMIN role
-
-  /management/stats:
-    get:
-      tags:
-        - management
-      summary: Retrieve general statistics
-      operationId: getStats
-      security:
-        - bearerAuth: [ ]
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StatsResponse'
 
   /collect/scan:
     get:
@@ -267,16 +367,6 @@ components:
         role:
           $ref: '#/components/schemas/Role'
 
-    StatsResponse:
-      type: object
-      properties:
-        totalStudents:
-          type: integer
-        totalVisits:
-          type: integer
-        visitsToday:
-          type: integer
-
     RegisterRequest:
       type: object
       properties:
@@ -305,6 +395,8 @@ components:
     Student:
       type: object
       properties:
+        id:
+          type: string
         firstname:
           type: string
         lastname:
@@ -327,7 +419,7 @@ components:
         lastVisit:
           type: string
           format: date
-        lastLocation:
+        lastDistribution:
           type: string
         qrCode:
           type: string
@@ -356,12 +448,44 @@ components:
           type: integer
       required: [ ]
 
+    StatsResponse:
+      type: object
+      properties:
+        totalStudents:
+          type: integer
+        totalVisits:
+          type: integer
+        visitsToday:
+          type: integer
+
+    Distribution:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        isActive:
+          type: boolean
+
+    DistributionCreateEditRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+        isActive:
+          type: boolean
+
     ValidateCollectRequest:
       type: object
       properties:
         studentId:
           type: string
-        location:
+        distributionId:
           type: string
         paymentMethod:
           $ref: '#/components/schemas/PaymentMethod'
@@ -374,8 +498,8 @@ components:
         visitDate:
           type: string
           format: date
-        location:
-          type: string
+        distribution:
+          $ref: '#/components/schemas/Distribution'
         paymentMethod:
           $ref: '#/components/schemas/PaymentMethod'
 
@@ -388,11 +512,46 @@ components:
     Formation:
       type: string
       enum:
+        - "ASPIC"
+        - "ISEN"
+        - "SEATECH"
+        - "ESADTPM"
+        - "BTS PI"
+        - "DUMONT"
+        - "TOURRACHE"
+        - "IEQT"
+        - "BONAPARTE"
+        - "CNAM"
+        - "IFPVPS"
+        - "KEDGE"
+        - "S2T"
+        - "GENIE BIOLOGIQUE"
+        - "TECHNIQUE DE COMMUNICATION"
+        - "STAPS"
+        - "GEA"
+        - "GEII"
+        - "GMP"
+        - "GIM"
+        - "IAE"
+        - "DROIT"
+        - "ECO GESTION"
+        - "INGEMEDIA"
+        - "MMI"
+        - "CAMONDO"
+        - "CROIX ROUGE"
+        - "PPA"
+        - "CAMPUS EDUCTIVE"
+        - "CONSERVATOIRE"
+        - "CFA"
+        - "ESGI"
+        - "YNOV"
+        - "AUTRE"
+      x-enum-varnames:
         - ASPIC
         - ISEN
         - SEATECH
         - ESADTPM
-        - BTS PI
+        - BTS_PI
         - DUMONT
         - TOURRACHE
         - IEQT
@@ -401,8 +560,8 @@ components:
         - IFPVPS
         - KEDGE
         - S2T
-        - GENIE BIOLOGIQUE
-        - TECHNIQUE DE COMMUNICATION
+        - GENIE_BIOLOGIQUE
+        - TECHNIQUE_DE_COMMUNICATION
         - STAPS
         - GEA
         - GEII
@@ -410,13 +569,13 @@ components:
         - GIM
         - IAE
         - DROIT
-        - ECO GESTION
+        - ECO_GESTION
         - INGEMEDIA
         - MMI
         - CAMONDO
-        - CROIX ROUGE
+        - CROIX_ROUGE
         - PPA
-        - CAMPUS EDUCTIVE
+        - CAMPUS_EDUCTIVE
         - CONSERVATOIRE
         - CFA
         - ESGI
@@ -426,11 +585,13 @@ components:
     Graduation:
       type: string
       enum:
+        - "BAC"
         - "BAC+2"
         - "BAC+3"
         - "BAC+5"
         - "BAC+8"
       x-enum-varnames:
+        - BAC
         - BAC_2
         - BAC_3
         - BAC_5

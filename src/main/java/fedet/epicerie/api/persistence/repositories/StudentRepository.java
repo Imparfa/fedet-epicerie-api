@@ -4,6 +4,8 @@ import fedet.epicerie.api.domain.models.Student;
 import fedet.epicerie.api.domain.ports.StudentPort;
 import fedet.epicerie.api.persistence.mappers.StudentMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -25,6 +27,11 @@ public class StudentRepository implements StudentPort {
     }
 
     @Override
+    public Page<Student> findAll(Pageable pageable) {
+        return studentRepositoryJPA.findAll(pageable).map(studentMapper::toModel);
+    }
+
+    @Override
     public Student findById(UUID id) {
         return studentRepositoryJPA.findById(id)
                 .map(studentMapper::toModel)
@@ -36,6 +43,11 @@ public class StudentRepository implements StudentPort {
         return studentRepositoryJPA.findByEmail(email)
                 .map(studentMapper::toModel)
                 .orElse(null);
+    }
+
+    @Override
+    public Page<Student> searchByNameOrEmail(String keyword, Pageable pageable) {
+        return studentRepositoryJPA.searchByNameOrEmail(keyword, pageable).map(studentMapper::toModel);
     }
 
     @Override
@@ -54,8 +66,8 @@ public class StudentRepository implements StudentPort {
     }
 
     @Override
-    public void updateLastLocationById(String lastLocation, UUID id) {
-        studentRepositoryJPA.updateLastLocationById(lastLocation, id);
+    public void updateLastDistributionById(String lastDistribution, UUID id) {
+        studentRepositoryJPA.updateLastDistributionById(lastDistribution, id);
     }
 
     @Override

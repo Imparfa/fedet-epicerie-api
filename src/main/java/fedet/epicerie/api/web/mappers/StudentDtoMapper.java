@@ -5,7 +5,7 @@ import fedet.epicerie.api.web.dtos.StudentDto;
 import fedet.epicerie.api.web.dtos.StudentEditRequestDto;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring", uses = GraduationDtoMapper.class)
+@Mapper(componentModel = "spring", uses = {GraduationDtoMapper.class, FormationDtoMapper.class})
 public interface StudentDtoMapper {
 
     StudentDto toDto(Student student);

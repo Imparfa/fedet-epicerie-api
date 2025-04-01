@@ -22,6 +22,6 @@ public class Student {
     private Integer household;
     private LocalDate createdAt;
     private LocalDate lastVisit;
-    private String lastLocation;
+    private String lastDistribution;
     private String qrCode;
 }

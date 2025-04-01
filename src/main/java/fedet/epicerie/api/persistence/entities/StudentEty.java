@@ -53,8 +53,8 @@ public class StudentEty {
     @Column(name = "LAST_VISIT")
     private LocalDate lastVisit;
 
-    @Column(name = "LAST_LOCATION")
-    private String lastLocation;
+    @Column(name = "LAST_DISTRIBUTION")
+    private String lastDistribution;
 
     @Column(name = "QR_CODE", columnDefinition = "TEXT")
     private String qrCode;

@@ -12,5 +12,9 @@ public interface DistributionPort {
 
     Distribution findByName(String name);
 
+    int updateById(UUID id, Distribution distribution);
+
     Distribution save(Distribution distribution);
+
+    void delete(UUID id);
 }

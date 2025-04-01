@@ -14,21 +14,21 @@ class VisitEtyTest implements WithRandom {
         // Given
         int id = randomInt();
         LocalDate visitDate = LocalDate.now().minusDays(5);
-        String location = randomString();
+        DistributionEty distribution = random(DistributionEty.class);
         String paymentMethod = randomString();
 
         // When
         VisitEty visitEty = new VisitEty();
         visitEty.setId(id);
         visitEty.setVisitDate(visitDate);
-        visitEty.setLocation(location);
+        visitEty.setDistribution(distribution);
         visitEty.setPaymentMethod(paymentMethod);
 
         // Then
         assertThat(visitEty).isNotNull();
         assertThat(visitEty.getId()).isEqualTo(id);
         assertThat(visitEty.getVisitDate()).isEqualTo(visitDate);
-        assertThat(visitEty.getLocation()).isEqualTo(location);
+        assertThat(visitEty.getDistribution()).isEqualTo(distribution);
         assertThat(visitEty.getPaymentMethod()).isEqualTo(paymentMethod);
     }
 
@@ -38,19 +38,19 @@ class VisitEtyTest implements WithRandom {
         VisitEty visitEty = random(VisitEty.class);
         int id = randomInt();
         LocalDate visitDate = LocalDate.now().minusDays(5);
-        String location = randomString();
+        DistributionEty distribution = random(DistributionEty.class);
         String paymentMethod = randomString();
 
         // When
         visitEty.setId(id);
         visitEty.setVisitDate(visitDate);
-        visitEty.setLocation(location);
+        visitEty.setDistribution(distribution);
         visitEty.setPaymentMethod(paymentMethod);
 
         // Then
         assertThat(visitEty.getId()).isEqualTo(id);
         assertThat(visitEty.getVisitDate()).isEqualTo(visitDate);
-        assertThat(visitEty.getLocation()).isEqualTo(location);
+        assertThat(visitEty.getDistribution()).isEqualTo(distribution);
         assertThat(visitEty.getPaymentMethod()).isEqualTo(paymentMethod);
     }
 }

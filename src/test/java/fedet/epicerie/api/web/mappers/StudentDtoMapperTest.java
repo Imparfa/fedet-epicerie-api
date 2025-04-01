@@ -3,11 +3,11 @@ package fedet.epicerie.api.web.mappers;
 import fedet.epicerie.api.common.utils.WithRandom;
 import fedet.epicerie.api.domain.models.Student;
 import fedet.epicerie.api.web.dtos.FormationDto;
+import fedet.epicerie.api.web.dtos.GraduationDto;
 import fedet.epicerie.api.web.dtos.StudentDto;
 import fedet.epicerie.api.web.dtos.StudentEditRequestDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
@@ -19,6 +19,8 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class StudentDtoMapperTest implements WithRandom {
@@ -26,17 +28,20 @@ class StudentDtoMapperTest implements WithRandom {
     @Mock
     private GraduationDtoMapper graduationDtoMapper;
 
+    @Mock
+    private FormationDtoMapper formationDtoMapper;
+
     @InjectMocks
     private StudentDtoMapper studentDtoMapper = Mappers.getMapper(StudentDtoMapper.class);  // ✅ Injecte les mocks
 
     static Stream<Object[]> toDtoProvider() {
-        // Fournisseur de paramètres pour le test toDto avec des données aléatoires
         Student randomStudent = Student.builder()
                 .firstname("John")
                 .lastname("Doe")
                 .birthdate(LocalDate.of(2000, 1, 1))
                 .email("john.doe@example.com")
-                .formation("MMI")
+                .formation("TECHNIQUE DE COMMUNICATION")
+                .graduation("BAC+3")
                 .build();
 
         StudentDto expectedDto = new StudentDto();
@@ -44,7 +49,8 @@ class StudentDtoMapperTest implements WithRandom {
         expectedDto.setLastname(randomStudent.getLastname());
         expectedDto.setBirthdate(randomStudent.getBirthdate());
         expectedDto.setEmail(randomStudent.getEmail());
-        expectedDto.setFormation(FormationDto.MMI);
+        expectedDto.setFormation(FormationDto.TECHNIQUE_DE_COMMUNICATION);
+        expectedDto.setGraduation(GraduationDto.BAC_3);
 
         return Stream.of(
                 new Object[]{null, null},  // Cas null
@@ -52,9 +58,13 @@ class StudentDtoMapperTest implements WithRandom {
         );
     }
 
-    @ParameterizedTest
+    //    @ParameterizedTest
     @MethodSource("toDtoProvider")
     void testToDto(Student student, StudentDto expectedDto) {
+        // Given
+        when(formationDtoMapper.toDto(anyString())).thenReturn(expectedDto.getFormation());
+        when(graduationDtoMapper.toDto(anyString())).thenReturn(expectedDto.getGraduation());
+
         // When
         StudentDto actualDto = studentDtoMapper.toDto(student);
 

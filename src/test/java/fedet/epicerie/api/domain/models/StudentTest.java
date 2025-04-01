@@ -20,7 +20,7 @@ class StudentTest implements WithRandom {
         String password = randomString();
         String formation = randomString();
         String graduation = randomString();
-        String lastLocation = randomString();
+        String lastDistribution = randomString();
         String qrCode = randomString();
         boolean isStudent = randomBoolean();
         boolean isWorker = randomBoolean();
@@ -38,7 +38,7 @@ class StudentTest implements WithRandom {
                 .password(password)
                 .formation(formation)
                 .graduation(graduation)
-                .lastLocation(lastLocation)
+                .lastDistribution(lastDistribution)
                 .qrCode(qrCode)
                 .isStudent(isStudent)
                 .isWorker(isWorker)
@@ -57,7 +57,7 @@ class StudentTest implements WithRandom {
         assertThat(student.getPassword()).isEqualTo(password);
         assertThat(student.getFormation()).isEqualTo(formation);
         assertThat(student.getGraduation()).isEqualTo(graduation);
-        assertThat(student.getLastLocation()).isEqualTo(lastLocation);
+        assertThat(student.getLastDistribution()).isEqualTo(lastDistribution);
         assertThat(student.getQrCode()).isEqualTo(qrCode);
         assertThat(student.getBirthdate()).isEqualTo(birthdate);
         assertThat(student.getCreatedAt()).isEqualTo(createdAt);
@@ -74,7 +74,7 @@ class StudentTest implements WithRandom {
         String email = randomString();
         String formation = randomString();
         String qrCode = randomString();
-        String lastLocation = randomString();
+        String lastDistribution = randomString();
         boolean isStudent = randomBoolean();
         boolean isWorker = randomBoolean();
         int household = randomInt() % 10 + 1;
@@ -83,7 +83,7 @@ class StudentTest implements WithRandom {
         student.setEmail(email);
         student.setFormation(formation);
         student.setQrCode(qrCode);
-        student.setLastLocation(lastLocation);
+        student.setLastDistribution(lastDistribution);
         student.setIsStudent(isStudent);
         student.setIsWorker(isWorker);
         student.setHousehold(household);
@@ -92,7 +92,7 @@ class StudentTest implements WithRandom {
         assertThat(student.getEmail()).isEqualTo(email);
         assertThat(student.getFormation()).isEqualTo(formation);
         assertThat(student.getQrCode()).isEqualTo(qrCode);
-        assertThat(student.getLastLocation()).isEqualTo(lastLocation);
+        assertThat(student.getLastDistribution()).isEqualTo(lastDistribution);
         assertThat(student.getIsStudent()).isEqualTo(isStudent);
         assertThat(student.getIsWorker()).isEqualTo(isWorker);
         assertThat(student.getHousehold()).isEqualTo(household);

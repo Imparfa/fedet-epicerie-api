@@ -36,7 +36,8 @@ class DistributionTest implements WithRandom {
     @Test
     void gettersAndSettersTest() {
         // Given
-        Distribution distribution = random(Distribution.class);
+        Distribution distribution = Distribution.builder().id(randomUUID())
+                .name(randomString()).address(randomString()).build();
         UUID id = randomUUID();
         String name = randomString();
         String address = randomString();

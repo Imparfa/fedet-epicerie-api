@@ -11,6 +11,6 @@ public class Visit {
     private Integer id;
     private Student student;
     private LocalDate visitDate;
-    private String location;
+    private Distribution distribution;
     private String paymentMethod;
 }

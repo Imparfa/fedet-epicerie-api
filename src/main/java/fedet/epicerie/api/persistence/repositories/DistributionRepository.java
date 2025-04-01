@@ -38,9 +38,19 @@ public class DistributionRepository implements DistributionPort {
     }
 
     @Override
+    public int updateById(UUID id, Distribution distribution) {
+        return distributionRepositoryJPA.updateNameAndAddressAndIsActiveById(distribution.getName(), distribution.getAddress(), distribution.getIsActive(), id);
+    }
+
+    @Override
     public Distribution save(Distribution distribution) {
         return distributionMapper.toModel(
                 distributionRepositoryJPA.save(distributionMapper.toEntity(distribution))
         );
+    }
+
+    @Override
+    public void delete(UUID id) {
+        distributionRepositoryJPA.deleteById(id);
     }
 }

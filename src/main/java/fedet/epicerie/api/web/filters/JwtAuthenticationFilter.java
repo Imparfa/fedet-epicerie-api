@@ -29,6 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtService.validateToken(token)) {
                 String email = jwtService.extractEmail(token);
                 String role = jwtService.extractRole(token);
+                System.out.println("Requête Entrante Intercepté : " + request);
                 System.out.println("En-tête Authorization : " + authHeader);
                 System.out.println("JWT Rôle détecté : " + role);
                 System.out.println("JWT Email détecté : " + email);
