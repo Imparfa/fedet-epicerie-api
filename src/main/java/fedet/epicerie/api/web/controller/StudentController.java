@@ -7,6 +7,7 @@ import fedet.epicerie.api.web.dtos.StudentDto;
 import fedet.epicerie.api.web.dtos.StudentEditRequestDto;
 import fedet.epicerie.api.web.mappers.StudentDtoMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
@@ -36,6 +38,16 @@ public class StudentController implements StudentApi {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         return ResponseEntity.ok(studentDtoMapper.toDto(existingStudent));
+    }
+
+    @Override
+    public ResponseEntity<Resource> getStudentCard(String id) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<Void> uploadStudentCard(String id, MultipartFile file) {
+        return null;
     }
 
     @Override

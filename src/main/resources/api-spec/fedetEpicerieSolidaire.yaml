@@ -123,9 +123,12 @@ paths:
 
   /students/{id}/card:
     post:
-      summary: Student Card Upload
       tags:
         - student
+      summary: Student Card Upload
+      operationId: uploadStudentCard
+      security:
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -150,9 +153,12 @@ paths:
         '401':
           description: Unauthorized - Requires student role
     get:
-      summary: Get Student Card Image
       tags:
         - student
+      summary: Get Student Card Image
+      operationId: getStudentCard
+      security:
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
