@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -126,14 +127,39 @@ public class ManagementController implements ManagementApi {
 
     @Override
     public ResponseEntity<StatsResponseDto> getStats() {
-        long totalStudents = studentPort.findAll().size();
-        long totalVisits = visitPort.findAll().size();
-        long visitsToday = visitPort.findByDate(LocalDate.now()).size();
+        Integer totalStudents = studentPort.findAll().size();
+        Integer totalVisits = visitPort.findAll().size();
+        Integer visitsToday = visitPort.findByDate(LocalDate.now()).size();
+        Integer cardPayments = visitPort.findByPaymentMethod("CARD").size();
+        Integer cashPayments = visitPort.findByPaymentMethod("CASH").size();
+        Integer totalDistributions = distributionPort.findAll().size();
+        Integer totalFormations = FormationDto.values().length;
+
+        List<StatDto> visitsByDistribution = distributionPort.findAll().stream()
+                .map(distribution -> new StatDto()
+                        .name(distribution.getName())
+                        .count(visitPort.findByDistributionId(distribution.getId()).size()))
+                .sorted((o1, o2) -> Integer.compare(o2.getCount(), o1.getCount()))
+                .collect(Collectors.toList());
+
+        List<StatDto> mostActiveFormations = Arrays.stream(FormationDto.values())
+                .map(formation -> new StatDto()
+                        .name(formation.name())
+                        .count(visitPort.findByFormation(formation.name()).size()))
+                .sorted((o1, o2) -> Integer.compare(o2.getCount(), o1.getCount()))
+                .limit(3).collect(Collectors.toList());
+
 
         StatsResponseDto stats = new StatsResponseDto()
-                .totalStudents((int) totalStudents)
-                .totalVisits((int) totalVisits)
-                .visitsToday((int) visitsToday);
+                .totalStudents(totalStudents)
+                .totalVisits(totalVisits)
+                .visitsToday(visitsToday)
+                .cardPayments(cardPayments)
+                .cashPayments(cashPayments)
+                .totalDistributions(totalDistributions)
+                .totalFormations(totalFormations)
+                .visitsByDistribution(visitsByDistribution)
+                .mostActiveFormations(mostActiveFormations);
 
         return ResponseEntity.ok(stats);
     }

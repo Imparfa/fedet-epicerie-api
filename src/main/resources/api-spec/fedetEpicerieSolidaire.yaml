@@ -57,7 +57,6 @@ paths:
         '401':
           description: Incorrect credentials
 
-
   /student/profile:
     get:
       tags:
@@ -122,6 +121,53 @@ paths:
         '404':
           description: Student not found
 
+  /students/{id}/card:
+    post:
+      summary: Student Card Upload
+      tags:
+        - student
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Student card uploaded successfully
+        '400':
+          description: Bad request - Invalid file format or size
+        '401':
+          description: Unauthorized - Requires student role
+    get:
+      summary: Get Student Card Image
+      tags:
+        - student
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Student card image retrieved successfully
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+
   /management/stats:
     get:
       tags:
@@ -155,7 +201,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Distribution'
-
     post:
       tags:
         - management
@@ -204,7 +249,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Distribution'
-
     delete:
       tags:
         - management
@@ -456,6 +500,29 @@ components:
         totalVisits:
           type: integer
         visitsToday:
+          type: integer
+        cardPayments:
+          type: integer
+        cashPayments:
+          type: integer
+        totalDistributions:
+          type: integer
+        totalFormations:
+          type: integer
+        visitsByDistribution:
+          type: array
+          items:
+            $ref: '#/components/schemas/Stat'
+        mostActiveFormations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Stat'
+    Stat:
+      type: object
+      properties:
+        name:
+          type: string
+        count:
           type: integer
 
     Distribution:

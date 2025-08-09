@@ -66,6 +66,27 @@ public class VisitRepository implements VisitPort {
     }
 
     @Override
+    public List<Visit> findByPaymentMethod(String paymentMethod) {
+        return visitRepositoryJPA.findByPaymentMethod(paymentMethod).stream()
+                .map(visitMapper::toModel)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Visit> findByDistributionId(UUID distributionId) {
+        return visitRepositoryJPA.findByDistributionId(distributionId).stream()
+                .map(visitMapper::toModel)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Visit> findByFormation(String formation) {
+        return visitRepositoryJPA.findByStudentFormation(formation).stream()
+                .map(visitMapper::toModel)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<Visit> findLast(Integer limit) {
         return visitRepositoryJPA.findRecentVisits(PageRequest.of(0, limit)).stream()
                 .map(visitMapper::toModel)

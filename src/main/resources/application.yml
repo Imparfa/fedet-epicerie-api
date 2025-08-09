@@ -16,6 +16,10 @@ spring:
     vault:
       uri: http://localhost:8200
       token: hvs.CAESILpMx-NePkdJKTUvUuSzDAtPEDpvSZHjTd4Z-YazCXwKGh4KHGh2cy5NR2J6V1Q1Z0g1YnZ3Q29WNEdiTjdMbG4
+      authentication: TOKEN
+      host: localhost
+      port: 8200
+      scheme: http
       kv:
         enabled: true
         backend: secret

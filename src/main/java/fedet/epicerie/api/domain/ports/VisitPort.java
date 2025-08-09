@@ -22,6 +22,12 @@ public interface VisitPort {
 
     List<Visit> findByEmail(String email);
 
+    List<Visit> findByPaymentMethod(String paymentMethod);
+
+    List<Visit> findByDistributionId(UUID distributionId);
+
+    List<Visit> findByFormation(String formation);
+
     List<Visit> findLast(Integer limit);
 
     Visit save(Visit visit);

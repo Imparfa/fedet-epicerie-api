@@ -25,4 +25,10 @@ public interface VisitRepositoryJPA extends JpaRepository<VisitEty, Integer> {
 
     @Query("SELECT v FROM VisitEty v ORDER BY v.visitDate DESC")
     List<VisitEty> findRecentVisits(Pageable pageable);
+
+    List<VisitEty> findByPaymentMethod(@NonNull String paymentMethod);
+
+    List<VisitEty> findByDistributionId(@NonNull UUID distributionId);
+
+    List<VisitEty> findByStudentFormation(String formation);
 }
