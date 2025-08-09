@@ -75,7 +75,8 @@ docker-compose up -d --build
 
 📄 L’API sera disponible sur :
 
-- **Swagger UI** : [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+- **Swagger UI
+  ** : [src/main/resources/api-spec/fedetEpicerieSolidaire.yaml](src/main/resources/api-spec/fedetEpicerieSolidaire.yaml)
 
 ---
 
