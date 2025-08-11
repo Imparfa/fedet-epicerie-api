@@ -128,7 +128,7 @@ mvn test
 ## 📦 Build
 
 ```bash
-mvn clean install
+mvn clean install -DskipTests
 ```
 
 Génère le fichier `.jar` dans `target/` prêt à être packagé avec Docker.
