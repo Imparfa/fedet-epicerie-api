@@ -1,0 +1,31 @@
+services:
+  database:
+    image: postgres:latest
+    container_name: distribution_db
+    restart: always
+    environment:
+      POSTGRES_DB: "DistributionFEDET"
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5494:5432"
+    volumes:
+      - distribution_data:/var/lib/postgresql/data
+
+  api:
+    image: distribution_api:latest
+    container_name: distribution_api
+    restart: always
+    depends_on:
+      - database
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/DistributionFEDET
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8080:8080"
+
+volumes:
+  distribution_data:

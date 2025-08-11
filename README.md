@@ -67,10 +67,11 @@ git clone https://github.com/Imparfa/fedet-epicerie-api.git
 cd fedet-epicerie-api
 
 # Construire le jar / Build the jar
-mvn clean install
+mvn clean install -DskipTests
 
 # Démarrer avec Docker Compose / Start with Docker Compose
-docker-compose up -d --build
+docker build -t distribution_api .
+docker compose up -d
 ```
 
 📄 L’API sera disponible sur :
