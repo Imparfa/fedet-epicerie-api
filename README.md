@@ -76,8 +76,7 @@ docker compose up -d
 
 📄 L’API sera disponible sur :
 
-- **Swagger UI
-  ** : [src/main/resources/api-spec/fedetEpicerieSolidaire.yaml](src/main/resources/api-spec/fedetEpicerieSolidaire.yaml)
+- **Swagger UI** : [src/main/resources/api-spec/fedetEpicerieSolidaire.yaml](src/main/resources/api-spec/fedetEpicerieSolidaire.yaml)
 
 ---
 
