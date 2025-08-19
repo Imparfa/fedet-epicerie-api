@@ -5,8 +5,8 @@ services:
     restart: always
     environment:
       POSTGRES_DB: "DistributionFEDET"
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: secret
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: fedet2025*
     ports:
       - "5432:5432"
     volumes:
@@ -20,8 +20,8 @@ services:
       - database
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/DistributionFEDET
-      SPRING_DATASOURCE_USERNAME: admin
-      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: fedet2025*
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     ports:
