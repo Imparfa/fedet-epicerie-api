@@ -4,13 +4,14 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Data
 @Builder
 public class Visit {
-    private Integer id;
+    private UUID id;
     private Student student;
-    private LocalDate visitDate;
     private Distribution distribution;
+    private LocalDate visitDate;
     private String paymentMethod;
 }

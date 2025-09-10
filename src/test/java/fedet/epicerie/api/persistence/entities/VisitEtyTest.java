@@ -4,6 +4,7 @@ import fedet.epicerie.api.common.utils.WithRandom;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,7 +13,7 @@ class VisitEtyTest implements WithRandom {
     @Test
     void constructorTest() {
         // Given
-        int id = randomInt();
+        UUID id = randomUUID();
         LocalDate visitDate = LocalDate.now().minusDays(5);
         DistributionEty distribution = random(DistributionEty.class);
         String paymentMethod = randomString();
@@ -36,7 +37,7 @@ class VisitEtyTest implements WithRandom {
     void gettersAndSettersTest() {
         // Given
         VisitEty visitEty = random(VisitEty.class);
-        int id = randomInt();
+        UUID id = randomUUID();
         LocalDate visitDate = LocalDate.now().minusDays(5);
         DistributionEty distribution = random(DistributionEty.class);
         String paymentMethod = randomString();

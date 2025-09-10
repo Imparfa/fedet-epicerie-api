@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-public interface VisitRepositoryJPA extends JpaRepository<VisitEty, Integer> {
+public interface VisitRepositoryJPA extends JpaRepository<VisitEty, UUID> {
     List<VisitEty> findByStudentId(@NonNull UUID studentId);
 
     List<VisitEty> findByVisitDate(@NonNull LocalDate visitDate);

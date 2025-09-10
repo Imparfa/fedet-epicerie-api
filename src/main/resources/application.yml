@@ -1,8 +1,8 @@
 spring:
   application:
-    name: FEDET Epicerie Solidaire API
+    name: FEDET Distributions API
   datasource:
-    url: 'jdbc:postgresql://localhost:5432/DistributionFEDET'
+    url: 'jdbc:postgresql://localhost:5432/FEDET'
     username: root
     password: fedet2025*
     driver-class-name: org.postgresql.Driver

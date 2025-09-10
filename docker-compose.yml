@@ -1,25 +1,25 @@
 services:
-  database:
+  fedet_database:
     image: postgres:latest
-    container_name: distribution_db
+    container_name: fedet_db
     restart: always
     environment:
-      POSTGRES_DB: "DistributionFEDET"
+      POSTGRES_DB: "FEDET"
       POSTGRES_USER: root
       POSTGRES_PASSWORD: fedet2025*
     ports:
       - "5432:5432"
     volumes:
-      - distribution_data:/var/lib/postgresql/data
+      - fedet_data:/var/lib/postgresql/data
 
-  api:
-    image: distribution_api:latest
-    container_name: distribution_api
+  fedet_api:
+    image: fedet_api:latest
+    container_name: fedet_api
     restart: always
     depends_on:
-      - database
+      - fedet_database
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/DistributionFEDET
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/FEDET
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: fedet2025*
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
@@ -28,4 +28,4 @@ services:
       - "8080:8080"
 
 volumes:
-  distribution_data:
+  fedet_data:

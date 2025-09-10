@@ -126,40 +126,83 @@ public class ManagementController implements ManagementApi {
     }
 
     @Override
-    public ResponseEntity<StatsResponseDto> getStats() {
-        Integer totalStudents = studentPort.findAll().size();
-        Integer totalVisits = visitPort.findAll().size();
-        Integer visitsToday = visitPort.findByDate(LocalDate.now()).size();
-        Integer cardPayments = visitPort.findByPaymentMethod("CARD").size();
-        Integer cashPayments = visitPort.findByPaymentMethod("CASH").size();
-        Integer totalDistributions = distributionPort.findAll().size();
-        Integer totalFormations = FormationDto.values().length;
+    public ResponseEntity<StatsResponseDto> getStats(LocalDate startDate, LocalDate endDate, String distributionId, Integer year, Integer month) {
+        // Gestion des conflits de filtres
+        if ((startDate != null || endDate != null) && (year != null || month != null)) {
+            return ResponseEntity.badRequest().build();
+        }
 
+        List<Visit> visits;
+
+        // 1. Filtrage par période
+        if (startDate != null && endDate != null) {
+            visits = visitPort.findByDateBetween(startDate, endDate);
+        }
+        // 2. Filtrage par année + mois
+        else if (year != null && month != null) {
+            visits = visitPort.findAll().stream()
+                    .filter(v -> v.getVisitDate().getYear() == year && v.getVisitDate().getMonthValue() == month)
+                    .collect(Collectors.toList());
+        }
+        // 3. Filtrage par année seule
+        else if (year != null) {
+            visits = visitPort.findAll().stream()
+                    .filter(v -> v.getVisitDate().getYear() == year)
+                    .collect(Collectors.toList());
+        }
+        // 4. Par défaut toutes les visites
+        else {
+            visits = visitPort.findAll();
+        }
+
+        // 5. Filtrage par distribution
+        if (distributionId != null) {
+            visits = visits.stream()
+                    .filter(v -> v.getDistribution() != null &&
+                            v.getDistribution().getId().toString().equals(distributionId))
+                    .collect(Collectors.toList());
+        }
+
+        // ⚡ Construire la réponse
+        StatsResponseDto stats = new StatsResponseDto();
+
+        stats.setTotalStudents(studentPort.findAll().size());
+        stats.setTotalVisits(visits.size());
+        stats.setVisitsToday((int) visits.stream()
+                .filter(v -> v.getVisitDate().isEqual(LocalDate.now()))
+                .count());
+        stats.setCardPayments((int) visits.stream()
+                .filter(v -> "CARD".equalsIgnoreCase(v.getPaymentMethod()))
+                .count());
+        stats.setCashPayments((int) visits.stream()
+                .filter(v -> "CASH".equalsIgnoreCase(v.getPaymentMethod()))
+                .count());
+        stats.setTotalDistributions(distributionPort.findAll().size());
+        stats.setTotalFormations(FormationDto.values().length);
+
+        // Visits par distribution
+        List<Visit> finalVisits = visits;
         List<StatDto> visitsByDistribution = distributionPort.findAll().stream()
                 .map(distribution -> new StatDto()
                         .name(distribution.getName())
-                        .count(visitPort.findByDistributionId(distribution.getId()).size()))
-                .sorted((o1, o2) -> Integer.compare(o2.getCount(), o1.getCount()))
+                        .count((int) finalVisits.stream()
+                                .filter(v -> v.getDistribution() != null &&
+                                        v.getDistribution().getId().equals(distribution.getId()))
+                                .count()))
                 .collect(Collectors.toList());
+        stats.setVisitsByDistribution(visitsByDistribution);
 
+        // Formations les plus actives
         List<StatDto> mostActiveFormations = Arrays.stream(FormationDto.values())
                 .map(formation -> new StatDto()
                         .name(formation.name())
-                        .count(visitPort.findByFormation(formation.name()).size()))
-                .sorted((o1, o2) -> Integer.compare(o2.getCount(), o1.getCount()))
-                .limit(3).collect(Collectors.toList());
-
-
-        StatsResponseDto stats = new StatsResponseDto()
-                .totalStudents(totalStudents)
-                .totalVisits(totalVisits)
-                .visitsToday(visitsToday)
-                .cardPayments(cardPayments)
-                .cashPayments(cashPayments)
-                .totalDistributions(totalDistributions)
-                .totalFormations(totalFormations)
-                .visitsByDistribution(visitsByDistribution)
-                .mostActiveFormations(mostActiveFormations);
+                        .count((int) finalVisits.stream()
+                                .filter(v -> v.getStudent() != null &&
+                                        v.getStudent().getFormation() != null &&
+                                        v.getStudent().getFormation().equals(formation.name()))
+                                .count()))
+                .collect(Collectors.toList());
+        stats.setMostActiveFormations(mostActiveFormations);
 
         return ResponseEntity.ok(stats);
     }

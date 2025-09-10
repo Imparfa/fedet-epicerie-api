@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -14,7 +15,7 @@ public class VisitEty {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID")
-    private Integer id;
+    private UUID id;
 
     @ManyToOne
     @JoinColumn(name = "STUDENT_ID", nullable = false)

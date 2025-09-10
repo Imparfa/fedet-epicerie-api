@@ -31,4 +31,5 @@ public interface VisitPort {
     List<Visit> findLast(Integer limit);
 
     Visit save(Visit visit);
+
 }
