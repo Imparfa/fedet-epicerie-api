@@ -121,7 +121,7 @@ paths:
         '404':
           description: Student not found
 
-  /students/{id}/card:
+  /student/{id}/card:
     post:
       tags:
         - student
@@ -133,8 +133,15 @@ paths:
         - name: id
           in: path
           required: true
+          description: Student ID
           schema:
             type: string
+        - name: side
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [front, back]
       requestBody:
         required: true
         content:
@@ -163,16 +170,54 @@ paths:
         - name: id
           in: path
           required: true
+          description: Student ID
           schema:
             type: string
       responses:
         '200':
           description: Student card image retrieved successfully
           content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Card'
+  /student/cards/{cardId}/image:
+    get:
+      tags:
+        - student
+      summary: Get the image of a student card (front or back)
+      operationId: getStudentCardImage
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: path
+          name: cardId
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: query
+          name: side
+          schema:
+            type: string
+            enum: [ front, back ]
+            default: front
+          required: false
+      responses:
+        '200':
+          description: Image de la carte
+          content:
             image/jpeg:
               schema:
                 type: string
                 format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Unknown card or side
+        '403':
+          description: Forbidden - Requires ADMIN role or the owner student
 
   /management/stats:
     get:
@@ -342,6 +387,72 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Student'
+        '403':
+          description: Forbidden - Requires ADMIN role
+
+  /management/cards/{cardId}/approve:
+    post:
+      summary: Approve a student card
+      tags:
+        - management
+      security:
+        - bearerAuth: [ ]
+      operationId: approveCard
+      parameters:
+        - in: path
+          name: cardId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalCardRequest'
+      responses:
+        '200':
+          description: Card approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Card'
+        '404':
+          description: Unknown card
+        '403':
+          description: Forbidden - Requires ADMIN role
+
+  /management/cards/{cardId}/reject:
+    post:
+      summary: Reject a student card
+      tags:
+        - management
+      security:
+        - bearerAuth: [ ]
+      operationId: rejectCard
+      parameters:
+        - in: path
+          name: cardId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalCardRequest'
+      responses:
+        '200':
+          description: Card rejected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Card'
+        '404':
+          description: Unknown card
         '403':
           description: Forbidden - Requires ADMIN role
 
@@ -535,6 +646,54 @@ components:
           type: integer
       required: [ ]
 
+    CardStatus:
+      type: string
+      enum: [ PENDING, APPROVED, REJECTED, EXPIRED ]
+
+    Card:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        studentId:
+          type: string
+          format: uuid
+        frontPath:
+          type: string
+        backPath:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/CardStatus'
+        validityDate:
+          type: string
+          format: date
+          nullable: true
+        uploadedAt:
+          type: string
+          format: date
+        validatedBy:
+          type: string
+          format: uuid
+          nullable: true
+
+    ApprovalCardRequest:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/CardStatus'
+        adminId:
+          type: string
+          format: uuid
+        validityDate:
+          type: string
+          format: date
+          nullable: true
+        reason:
+          type: string
+          nullable: true
+
     StatsResponse:
       type: object
       properties:
@@ -699,12 +858,14 @@ components:
         - "BAC+2"
         - "BAC+3"
         - "BAC+5"
+        - "BAC+7"
         - "BAC+8"
       x-enum-varnames:
         - BAC
         - BAC_2
         - BAC_3
         - BAC_5
+        - BAC_7
         - BAC_8
     Role:
       type: string

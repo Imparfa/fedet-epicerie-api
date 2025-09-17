@@ -24,6 +24,26 @@ spring:
         enabled: true
         backend: secret
         application-name: jwt-passphrase
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+server:
+  port: 8080
+#  ssl:
+#    key-alias: fedet
+#    key-store: ./release.keystore
+#    key-store-password: fedet2025*
+#    key-store-type: RSA
+#    enabled: true
+
+cards:
+  storage:
+    base-dir: /var/lib/postgresql/data/student_cards
+    max-bytes: 8388608
+    allowed-content-types: [image/jpeg, image/png]
+
 #  web:
 #    cors:
 #      allowed-origin-patterns: http://localhost:8100
@@ -64,9 +84,9 @@ spring:
 spring.config.activate.on-profile: production
 spring:
   datasource:
-    url: 'jdbc:postgresql://localhost:5494/fedetEpicerieSolidaire'
+    url: 'jdbc:postgresql://localhost:5494/FEDET'
     username: root
-    password: root
+    password: fedet2025*
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

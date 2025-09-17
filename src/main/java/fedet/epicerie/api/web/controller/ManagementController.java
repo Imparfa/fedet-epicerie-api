@@ -1,13 +1,16 @@
 package fedet.epicerie.api.web.controller;
 
+import fedet.epicerie.api.domain.models.Card;
 import fedet.epicerie.api.domain.models.Distribution;
 import fedet.epicerie.api.domain.models.Student;
 import fedet.epicerie.api.domain.models.Visit;
+import fedet.epicerie.api.domain.ports.CardPort;
 import fedet.epicerie.api.domain.ports.DistributionPort;
 import fedet.epicerie.api.domain.ports.StudentPort;
 import fedet.epicerie.api.domain.ports.VisitPort;
 import fedet.epicerie.api.web.apis.ManagementApi;
 import fedet.epicerie.api.web.dtos.*;
+import fedet.epicerie.api.web.mappers.CardDtoMapper;
 import fedet.epicerie.api.web.mappers.DistributionDtoMapper;
 import fedet.epicerie.api.web.mappers.StudentDtoMapper;
 import fedet.epicerie.api.web.mappers.VisitDtoMapper;
@@ -16,12 +19,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -33,9 +38,11 @@ import java.util.stream.Collectors;
 @PreAuthorize("hasRole('ADMIN')")
 public class ManagementController implements ManagementApi {
     private final StudentPort studentPort;
+    private final CardPort cardPort;
     private final DistributionPort distributionPort;
     private final VisitPort visitPort;
     private final StudentDtoMapper studentDtoMapper;
+    private final CardDtoMapper cardDtoMapper;
     private final VisitDtoMapper visitDtoMapper;
     private final DistributionDtoMapper distributionDtoMapper;
 
@@ -89,6 +96,37 @@ public class ManagementController implements ManagementApi {
     }
 
     @Override
+    public ResponseEntity<CardDto> approveCard(UUID cardId, ApprovalCardRequestDto approvalCardRequestDto) {
+        Card card = cardPort.findById(cardId).orElse(null);
+        if (card == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        card.setStatus(CardStatusDto.APPROVED.getValue());
+        card.setValidatedBy(approvalCardRequestDto.getAdminId());
+        if (approvalCardRequestDto.getValidityDate() != null) {
+            card.setValidityDate(approvalCardRequestDto.getValidityDate());
+        }
+
+        Card saved = cardPort.save(card);
+        return ResponseEntity.ok(cardDtoMapper.toDto(saved));
+    }
+
+    @Override
+    public ResponseEntity<CardDto> rejectCard(UUID cardId, ApprovalCardRequestDto approvalCardRequestDto) {
+        Card card = cardPort.findById(cardId).orElse(null);
+        if (card == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        card.setStatus(CardStatusDto.REJECTED.getValue());
+        card.setValidatedBy(approvalCardRequestDto.getAdminId());
+
+        Card saved = cardPort.save(card);
+        return ResponseEntity.ok(cardDtoMapper.toDto(saved));
+    }
+
+    @Override
     public ResponseEntity<DistributionDto> updateDistribution(String id, DistributionCreateEditRequestDto distributionCreateEditRequestDto) {
         UUID targetId = UUID.fromString(id);
         Distribution distribution = distributionPort.findById(targetId);
@@ -127,35 +165,30 @@ public class ManagementController implements ManagementApi {
 
     @Override
     public ResponseEntity<StatsResponseDto> getStats(LocalDate startDate, LocalDate endDate, String distributionId, Integer year, Integer month) {
-        // Gestion des conflits de filtres
         if ((startDate != null || endDate != null) && (year != null || month != null)) {
             return ResponseEntity.badRequest().build();
         }
 
         List<Visit> visits;
 
-        // 1. Filtrage par période
         if (startDate != null && endDate != null) {
             visits = visitPort.findByDateBetween(startDate, endDate);
-        }
-        // 2. Filtrage par année + mois
-        else if (year != null && month != null) {
+        } else if (year != null && month != null) {
             visits = visitPort.findAll().stream()
                     .filter(v -> v.getVisitDate().getYear() == year && v.getVisitDate().getMonthValue() == month)
                     .collect(Collectors.toList());
-        }
-        // 3. Filtrage par année seule
-        else if (year != null) {
+        } else if (year != null) {
             visits = visitPort.findAll().stream()
                     .filter(v -> v.getVisitDate().getYear() == year)
                     .collect(Collectors.toList());
-        }
-        // 4. Par défaut toutes les visites
-        else {
+        } else if (month != null) {
+            visits = visitPort.findAll().stream()
+                    .filter(v -> v.getVisitDate().getYear() == LocalDate.now().getYear() && v.getVisitDate().getMonthValue() == month)
+                    .collect(Collectors.toList());
+        } else {
             visits = visitPort.findAll();
         }
 
-        // 5. Filtrage par distribution
         if (distributionId != null) {
             visits = visits.stream()
                     .filter(v -> v.getDistribution() != null &&
@@ -163,10 +196,38 @@ public class ManagementController implements ManagementApi {
                     .collect(Collectors.toList());
         }
 
-        // ⚡ Construire la réponse
         StatsResponseDto stats = new StatsResponseDto();
+        List<Student> allStudents = studentPort.findAll();
+        List<Student> filteredStudents;
 
-        stats.setTotalStudents(studentPort.findAll().size());
+        if (startDate != null && endDate != null) {
+            filteredStudents = allStudents.stream()
+                    .filter(s -> s.getCreatedAt() != null &&
+                            !s.getCreatedAt().isAfter(endDate) &&
+                            !s.getCreatedAt().isBefore(startDate))
+                    .collect(Collectors.toList());
+        } else if (year != null && month != null) {
+            filteredStudents = allStudents.stream()
+                    .filter(s -> s.getCreatedAt() != null &&
+                            s.getCreatedAt().getYear() == year &&
+                            s.getCreatedAt().getMonthValue() == month)
+                    .collect(Collectors.toList());
+        } else if (year != null) {
+            filteredStudents = allStudents.stream()
+                    .filter(s -> s.getCreatedAt() != null &&
+                            s.getCreatedAt().getYear() == year)
+                    .collect(Collectors.toList());
+        } else if (month != null) {
+            filteredStudents = allStudents.stream()
+                    .filter(s -> s.getCreatedAt() != null &&
+                            s.getCreatedAt().getYear() == LocalDate.now().getYear() &&
+                            s.getCreatedAt().getMonthValue() == month)
+                    .collect(Collectors.toList());
+        } else {
+            filteredStudents = allStudents;
+        }
+
+        stats.setTotalStudents(filteredStudents.size());
         stats.setTotalVisits(visits.size());
         stats.setVisitsToday((int) visits.stream()
                 .filter(v -> v.getVisitDate().isEqual(LocalDate.now()))
@@ -201,7 +262,8 @@ public class ManagementController implements ManagementApi {
                                         v.getStudent().getFormation() != null &&
                                         v.getStudent().getFormation().equals(formation.name()))
                                 .count()))
-                .collect(Collectors.toList());
+                .sorted((o1, o2) -> Integer.compare(o2.getCount(), o1.getCount()))
+                .limit(5).collect(Collectors.toList());
         stats.setMostActiveFormations(mostActiveFormations);
 
         return ResponseEntity.ok(stats);
