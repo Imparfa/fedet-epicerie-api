@@ -1,4 +1,4 @@
-package fedet.epicerie.api.web.controller;
+package fedet.epicerie.api.web.controllers;
 
 import fedet.epicerie.api.domain.models.Card;
 import fedet.epicerie.api.domain.models.Student;
@@ -18,14 +18,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
@@ -62,7 +60,7 @@ public class StudentController implements StudentApi {
     }
 
     @Override
-    public ResponseEntity<CardDto> getStudentCard(String id) {
+    public ResponseEntity<CardDto> getStudentCard(@PathVariable String id) {
         UUID studentId = UUID.fromString(id);
         if (hasAuthorisation(studentId))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -80,7 +78,7 @@ public class StudentController implements StudentApi {
     }
 
     @Override
-    public ResponseEntity<Resource> getStudentCardImage(UUID cardId, String side) {
+    public ResponseEntity<Resource> getStudentCardImage(@PathVariable UUID cardId, @RequestParam @NonNull String side) {
         Card card = cardPort.findById(cardId).orElse(null);
         if (card == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
@@ -107,7 +105,7 @@ public class StudentController implements StudentApi {
     }
 
     @Override
-    public ResponseEntity<Void> uploadStudentCard(String id, String side, MultipartFile file) {
+    public ResponseEntity<Void> uploadStudentCard(@PathVariable String id, @RequestParam @NonNull String side, @RequestPart @NonNull MultipartFile file) {
         UUID studentId = UUID.fromString(id);
         if (hasAuthorisation(studentId))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();

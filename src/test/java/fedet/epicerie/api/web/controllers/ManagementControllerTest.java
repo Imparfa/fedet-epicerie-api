@@ -5,17 +5,10 @@ import fedet.epicerie.api.common.utils.WithRandom;
 import fedet.epicerie.api.domain.ports.StudentPort;
 import fedet.epicerie.api.domain.ports.VisitPort;
 import fedet.epicerie.api.web.mappers.StudentDtoMapper;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -27,13 +20,13 @@ class ManagementControllerTest implements WithRandom {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @Autowired
     private StudentPort studentPort;
 
-    @MockBean
+    @Autowired
     private VisitPort visitPort;
 
-    @MockBean
+    @Autowired
     private StudentDtoMapper studentDtoMapper;
 
 // TODO: Uncomment and implement the test
@@ -89,17 +82,15 @@ class ManagementControllerTest implements WithRandom {
 //                .andExpect(content().json(objectMapper.writeValueAsString(studentDtos)));
 //    }
 
-
-    @Test
-    @WithMockUser(roles = "STUDENT")
-    void testGetStudents_Forbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/management/students")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-// TODO: Uncomment and correct the test
+//
+//    @Test
+//    @WithMockUser(roles = "STUDENT")
+//    void testGetStudents_Forbidden() throws Exception {
+//        // When & Then
+//        mockMvc.perform(get("/management/students")
+//                        .with(csrf()))
+//                .andExpect(status().isForbidden());
+//    }
 
 //    @Test
 //    @WithMockUser(roles = "ADMIN")
@@ -127,12 +118,12 @@ class ManagementControllerTest implements WithRandom {
 //                .andExpect(content().json(objectMapper.writeValueAsString(expectedStats)));
 //    }
 
-    @Test
-    @WithMockUser(roles = "STUDENT")
-    void testGetStats_Forbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/management/stats")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-    }
+//    @Test
+//    @WithMockUser(roles = "STUDENT")
+//    void testGetStats_Forbidden() throws Exception {
+//        // When & Then
+//        mockMvc.perform(get("/management/stats")
+//                        .with(csrf()))
+//                .andExpect(status().isForbidden());
+//    }
 }

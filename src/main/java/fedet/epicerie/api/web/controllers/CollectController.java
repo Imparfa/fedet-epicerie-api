@@ -1,4 +1,4 @@
-package fedet.epicerie.api.web.controller;
+package fedet.epicerie.api.web.controllers;
 
 import fedet.epicerie.api.domain.models.Distribution;
 import fedet.epicerie.api.domain.models.Student;
@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,7 +45,7 @@ public class CollectController implements CollectApi {
     }
 
     @Override
-    public ResponseEntity<Void> collectValidate(ValidateCollectRequestDto requestDto) {
+    public ResponseEntity<Void> collectValidate(@RequestBody ValidateCollectRequestDto requestDto) {
         Student student = studentPort.findById(UUID.fromString(requestDto.getStudentId()));
         Distribution distribution = distributionPort.findById(UUID.fromString(requestDto.getDistributionId()));
         if (student != null && distribution != null) {

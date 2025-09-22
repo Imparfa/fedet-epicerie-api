@@ -1,4 +1,4 @@
-package fedet.epicerie.api.web.controller;
+package fedet.epicerie.api.web.controllers;
 
 import fedet.epicerie.api.domain.models.Card;
 import fedet.epicerie.api.domain.models.Distribution;
@@ -22,11 +22,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -47,7 +45,7 @@ public class ManagementController implements ManagementApi {
     private final DistributionDtoMapper distributionDtoMapper;
 
     @Override
-    public ResponseEntity<List<StudentDto>> getStudents(Integer page, Integer size, String search) {
+    public ResponseEntity<List<StudentDto>> getStudents(@RequestParam Integer page, @RequestParam Integer size, @RequestParam(required = false) String search) {
         int effectivePage = (page != null && page >= 0) ? page : 0;
         int effectiveSize = (size != null && size > 0) ? size : 20;
 
@@ -70,7 +68,7 @@ public class ManagementController implements ManagementApi {
     }
 
     @Override
-    public ResponseEntity<List<VisitDto>> getVisits(String email, LocalDate startDate, LocalDate endDate) {
+    public ResponseEntity<List<VisitDto>> getVisits(@RequestParam String email, @RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
         List<Visit> visits;
 
         if (email != null && startDate != null && endDate != null) {
@@ -96,7 +94,7 @@ public class ManagementController implements ManagementApi {
     }
 
     @Override
-    public ResponseEntity<CardDto> approveCard(UUID cardId, ApprovalCardRequestDto approvalCardRequestDto) {
+    public ResponseEntity<CardDto> approveCard(@PathVariable UUID cardId, @RequestBody ApprovalCardRequestDto approvalCardRequestDto) {
         Card card = cardPort.findById(cardId).orElse(null);
         if (card == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -113,7 +111,7 @@ public class ManagementController implements ManagementApi {
     }
 
     @Override
-    public ResponseEntity<CardDto> rejectCard(UUID cardId, ApprovalCardRequestDto approvalCardRequestDto) {
+    public ResponseEntity<CardDto> rejectCard(@PathVariable UUID cardId, @RequestBody ApprovalCardRequestDto approvalCardRequestDto) {
         Card card = cardPort.findById(cardId).orElse(null);
         if (card == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -127,7 +125,7 @@ public class ManagementController implements ManagementApi {
     }
 
     @Override
-    public ResponseEntity<DistributionDto> updateDistribution(String id, DistributionCreateEditRequestDto distributionCreateEditRequestDto) {
+    public ResponseEntity<DistributionDto> updateDistribution(@PathVariable String id, @RequestBody DistributionCreateEditRequestDto distributionCreateEditRequestDto) {
         UUID targetId = UUID.fromString(id);
         Distribution distribution = distributionPort.findById(targetId);
         if (distribution != null) {
@@ -140,7 +138,7 @@ public class ManagementController implements ManagementApi {
     }
 
     @Override
-    public ResponseEntity<DistributionDto> createDistribution(DistributionCreateEditRequestDto distributionCreateEditRequestDto) {
+    public ResponseEntity<DistributionDto> createDistribution(@RequestBody DistributionCreateEditRequestDto distributionCreateEditRequestDto) {
         Distribution newDistribution = Distribution.builder()
                 .name(distributionCreateEditRequestDto.getName())
                 .address(distributionCreateEditRequestDto.getAddress())
@@ -150,7 +148,7 @@ public class ManagementController implements ManagementApi {
     }
 
     @Override
-    public ResponseEntity<Void> deleteDistribution(String id) {
+    public ResponseEntity<Void> deleteDistribution(@PathVariable String id) {
         UUID targetId = UUID.fromString(id);
         if (distributionPort.findById(targetId) == null)
             return ResponseEntity.notFound().build();
@@ -164,7 +162,7 @@ public class ManagementController implements ManagementApi {
     }
 
     @Override
-    public ResponseEntity<StatsResponseDto> getStats(LocalDate startDate, LocalDate endDate, String distributionId, Integer year, Integer month) {
+    public ResponseEntity<StatsResponseDto> getStats(@RequestParam(required = false) LocalDate startDate, @RequestParam(required = false) LocalDate endDate, @RequestParam(required = false) String distributionId, @RequestParam(required = false) Integer year, @RequestParam(required = false) Integer month) {
         if ((startDate != null || endDate != null) && (year != null || month != null)) {
             return ResponseEntity.badRequest().build();
         }

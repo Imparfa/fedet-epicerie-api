@@ -1,4 +1,4 @@
-package fedet.epicerie.api.web.controller;
+package fedet.epicerie.api.web.controllers;
 
 import fedet.epicerie.api.domain.models.Admin;
 import fedet.epicerie.api.domain.models.Student;
